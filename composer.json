@@ -1,0 +1,26 @@
+{
+    "name": "socodo/injection",
+    "description": "Dependency injection component for socodo.",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Socodo\\Injection\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Qroffle Inc.",
+            "email": "socodo@qroffle.com"
+        }
+    ],
+    "require": {
+        "php": "^8.1",
+        "psr/container": "^2.0"
+    },
+    "require-dev": {
+        "codeception/codeception": "^5.0",
+        "codeception/module-phpbrowser": "*",
+        "codeception/module-asserts": "*"
+    }
+}
