@@ -7,11 +7,13 @@ use Exception;
 use Psr\Container\ContainerInterface;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionMethod;
 use ReflectionNamedType;
 use ReflectionParameter;
 use Socodo\Injection\Exceptions\ClassNotFoundException;
 use Socodo\Injection\Exceptions\EntryNotFoundException;
 use Socodo\Injection\Exceptions\InjectionException;
+use Throwable;
 
 class Container implements ContainerInterface
 {
@@ -93,6 +95,32 @@ class Container implements ContainerInterface
     {
         $this->dropStaleBindings($id);
         $this->shared[$id] = $instance;
+    }
+
+    /**
+     * Call a method.
+     *
+     * @param string $id
+     * @param string $methodName
+     * @return mixed|void
+     * @throws InjectionException
+     */
+    public final function call (string $id, string $methodName)
+    {
+        $entry = $this->get($id);
+
+        try
+        {
+            $reflector = new ReflectionMethod($entry, $methodName);
+            $reflectionProperties = $reflector->getParameters();
+            $parameters = $this->resolveDependencies($reflectionProperties);
+
+            return $reflector->invokeArgs($entry, $parameters);
+        }
+        catch (Throwable)
+        {
+            throw new InjectionException('Target method "' . $id . ':' . $methodName . '" cannot be injected with proper dependencies.');
+        }
     }
 
     /**
