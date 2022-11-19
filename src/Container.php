@@ -102,10 +102,12 @@ class Container implements ContainerInterface
      *
      * @param string $id
      * @param string $methodName
+     * @param array $parameters
      * @return mixed|void
+     * @throws EntryNotFoundException
      * @throws InjectionException
      */
-    public final function call (string $id, string $methodName)
+    public final function call (string $id, string $methodName, array $parameters = [])
     {
         $entry = $this->get($id);
 
@@ -113,13 +115,15 @@ class Container implements ContainerInterface
         {
             $reflector = new ReflectionMethod($entry, $methodName);
             $reflectionProperties = $reflector->getParameters();
+
+            $this->buildParameters[] = $parameters;
             $parameters = $this->resolveDependencies($reflectionProperties);
 
             return $reflector->invokeArgs($entry, $parameters);
         }
         catch (Throwable)
         {
-            throw new InjectionException('Target method "' . $id . ':' . $methodName . '" cannot be injected with proper dependencies.');
+            throw new InjectionException('Target method "' . $id . '::' . $methodName . '" cannot be injected with proper dependencies.');
         }
     }
 
